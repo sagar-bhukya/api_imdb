@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from watchlis_app.models import WatchList,StreamPlatform
+from watchlis_app.models import WatchList,StreamPlatform,Review
 '''
 #serializers fields:handle the validation and transformation of data ex: charfield,integerfiled,FloatField
 #Core Arguments for Fields:Each serializer field takes a number of common arguments ex: read_only,required etc...
@@ -78,9 +78,19 @@ class MovieSerializer(serializers.Serializer):
 
 
 #ModelSerializer: Fields are automatically generated based on the model.
+class ReviewSerializer(serializers.ModelSerializer):
+    review_user=serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model=Review
+        # fields='__all__'
+        exclude=['watchList']# while creating review this should be excluded 
+
+
 class WatchListSerializer(serializers.ModelSerializer):
+    reviews=ReviewSerializer(many=True,read_only=True)
     #custom_serializer fields using serializerMethodFeild() : this will add in api this will not store in database
     # len_name=serializers.SerializerMethodField() #then create method using get_
+
     class Meta:
         model=WatchList
         fields="__all__" # all objects display webapi by url
@@ -109,6 +119,16 @@ class WatchListSerializer(serializers.ModelSerializer):
 #create serializer for StreamPlatform
 
 class StreamPlatformSerializer(serializers.ModelSerializer):
-    class Meta:
+# class StreamPlatformSerializer(serializers.HyperlinkedModelSerializer):# By default the serializer will include a url field instead of a primary key field.
+    #watchlist name from models relatatd_name same name we 
+    watchList=WatchListSerializer(many=True,read_only=True)# nested serializer or nested relations this will display what are the moviews do have for particular stream
+    #watchList=serializers.StringRelatedField(many=True)# from __str__ that will only return
+    #watchList=serializers.PrimaryKeyRelatedField(many=True,read_only=True)# returns only primary keys of their wwatchlist
+
+    # watchList=serializers.HyperlinkedRelatedField(many=True,read_only=True,view_name="movie-datails")#here wa can directly access our movie link url path "http://127.0.0.1:8000/watch/list/5/"
+
+    class Meta: 
         model=StreamPlatform
         fields='__all__'
+
+
