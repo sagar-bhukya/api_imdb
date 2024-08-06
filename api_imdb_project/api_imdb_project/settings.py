@@ -134,3 +134,16 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# this is the global permission 
+# REST_FRAMEWORK = {
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.IsAuthenticated', #IsAuthenticated user should logged in then only can do something
+#         # 'rest_framework.permissions.AllowAny', # by default can no need to logged in
+#         #IsAdminUser
+#         #IsAuthenticatedOrReadOnly
+#     ]
+#     # in future there is no need to write many REST_FRAMEWORK
+# }

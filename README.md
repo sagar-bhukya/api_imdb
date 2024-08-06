@@ -25,3 +25,8 @@ Choosing Between Serializer and ModelSerializer
 Use Serializer when you have non-model data, complex validation logic, or need full control over the serialized data.
 Use ModelSerializer when working with Django models and you want to quickly create a serializer with minimal custom logic.'''
 
+
+
+
+# Permissions :
+In Django, permissions are a way to control access to different parts of your application. They help manage what actions a user can perform, such as reading, writing, or deleting data. Django's permission system is very flexible and can be customized to fit the needs of your application.

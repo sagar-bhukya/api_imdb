@@ -8,6 +8,8 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 
+from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
+
 from rest_framework.views import APIView #class based views
 
 #function based views -----------------------
@@ -226,6 +228,8 @@ from rest_framework import generics,mixins
 
 class ReviewMixins(generics.ListAPIView):
     serializer_class = ReviewSerializer
+    #block level permission it use for only this one
+    permission_classes=[IsAuthenticated]   # when i access this without logged in this will give me->"detail": "Authentication credentials were not provided."
 
     def get_queryset(self):
         pk = self.kwargs['pk']  # Access the 'pk' parameter from the URL
@@ -248,4 +252,4 @@ class ReviewCreate(generics.CreateAPIView):
 class ReviewMixinsDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset=Review.objects.all()
     serializer_class=ReviewSerializer
-
+    permission_classes=[IsAuthenticatedOrReadOnly]# we can read only if user is not logged in
