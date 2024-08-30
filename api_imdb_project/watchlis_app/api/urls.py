@@ -20,7 +20,7 @@ urlpatterns = [
 
     # path('reviews/',ReviewMixins.as_view(),name="reviews"),
     # path('stream/<int:pk>/reviews/',ReviewMixinsDetails.as_view(),name="review-details"),
-    path('stream/<int:pk>/reviews-create',ReviewCreate.as_view(),name="review-create"),
-    path('stream/<int:pk>/reviews/',ReviewMixins.as_view(),name="review-details"),
-    path('stream/reviews/<int:pk>/',ReviewMixinsDetails.as_view(),name="reviews"),
+    path('<int:pk>/review-create/',ReviewCreate.as_view(),name="review-create"),
+    path('<int:pk>/reviews/',ReviewMixins.as_view(),name="review-details"),
+    path('review/<int:pk>/',ReviewMixinsDetails.as_view(),name="reviews"),
 ]

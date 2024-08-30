@@ -12,6 +12,8 @@ from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 
 from rest_framework.views import APIView #class based views
 
+from watchlis_app.api.permissions import IsAdminOrReadOnly,IsReviewUserOrReadOnly
+
 #function based views -----------------------
 
 # @api_view(['GET','POST'])
@@ -58,6 +60,7 @@ from rest_framework.views import APIView #class based views
 
 #class based views---------------------
 class MovieListAv(APIView):
+    permission_classes = [IsAdminOrReadOnly] #only admin can edit rest of all them read only
     def get(self,request): #here we are directly define get method and here we not gona write any if condition like function based views
         movies=WatchList.objects.all()
         serializer=WatchListSerializer(movies,many=True)# for getting more we need to give many==true
@@ -73,6 +76,9 @@ class MovieListAv(APIView):
     
 
 class MovieDetailAV(APIView):
+
+    permission_classes = [IsAdminOrReadOnly] #only admin can edit rest of all them read only
+
     def get(self,request,pk):
         try:
             movie=WatchList.objects.get(pk=pk)
@@ -140,11 +146,13 @@ class StreamPlatformViewset(viewsets.ViewSet):
 class StreamPlatformViewset(viewsets.ModelViewSet): # and another one is ReadOnlyModelViewset it gives only Retrive and list
     queryset=StreamPlatform.objects.all()
     serializer_class=StreamPlatformSerializer #serializer_class must give
+    permission_classes = [IsAdminOrReadOnly] #only admin can edit rest of all them read only
 
 
 
 
 class StreamPlatformAv(APIView):
+    permission_classes = [IsAdminOrReadOnly] #only admin can edit rest of all them read only
     def get(self,request):
         platform=StreamPlatform.objects.all()
         # serializer=StreamPlatformSerializer(platform,many=True,context={'request': request})# context used when it comes to hyperlink
@@ -162,7 +170,7 @@ class StreamPlatformAv(APIView):
 
 #for specific stream update      
 class StreamPlatformDetailAV(APIView):
-    
+    permission_classes = [IsAdminOrReadOnly] #only admin can edit rest of all them read only
     def get(self,request,id):
         try:
             platform=StreamPlatform.objects.get(id=id)
@@ -229,7 +237,7 @@ from rest_framework import generics,mixins
 class ReviewMixins(generics.ListAPIView):
     serializer_class = ReviewSerializer
     #block level permission it use for only this one
-    permission_classes=[IsAuthenticated]   # when i access this without logged in this will give me->"detail": "Authentication credentials were not provided."
+    # permission_classes=[IsAuthenticated]   # when i access this without logged in this will give me->"detail": "Authentication credentials were not provided."
 
     def get_queryset(self):
         pk = self.kwargs['pk']  # Access the 'pk' parameter from the URL
@@ -238,6 +246,7 @@ class ReviewMixins(generics.ListAPIView):
 class ReviewCreate(generics.CreateAPIView):
     queryset = Review.objects.all()
     serializer_class=ReviewSerializer
+    permission_classes=[IsAuthenticated]
 
     def perform_create(self,serializer): #it will act as post 
         pk=self.kwargs.get('pk')
@@ -246,10 +255,21 @@ class ReviewCreate(generics.CreateAPIView):
         review_queryset=Review.objects.filter(watchList=watchList,review_user=review_user)
         if review_queryset.exists():
             raise ValidationError("You have already reviewed this movie ")
+        
+        if watchList.number_rating==0:
+            watchList.avg_arting=serializer.validated_data['rating'] #getting new rating value
+        else:
+            watchList.avg_arting=(watchList.avg_arting + serializer.validated_data['rating'])/2
+        
+        watchList.number_rating=watchList.number_rating+1
+        watchList.save()
 
         serializer.save(watchList=watchList,review_user=review_user)
 
 class ReviewMixinsDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset=Review.objects.all()
     serializer_class=ReviewSerializer
-    permission_classes=[IsAuthenticatedOrReadOnly]# we can read only if user is not logged in
+    # permission_classes=[IsAuthenticatedOrReadOnly]# we can read only if user is not logged in
+
+    # permission_classes=[IsAdminOrReadOnly]# here when the user logged then only can see the delete and edit option either he can see only get method
+    permission_classes=[IsReviewUserOrReadOnly]# only admin can edit rest of all onlg get

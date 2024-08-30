@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'watchlis_app',
     'rest_framework',
+    'rest_framework.authtoken',# this can do create table called Token in DB after this you need to migrate
+    'user_app',
 ]
 
 MIDDLEWARE = [
@@ -147,3 +149,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     ]
 #     # in future there is no need to write many REST_FRAMEWORK
 # }
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        # 'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ]
+}
