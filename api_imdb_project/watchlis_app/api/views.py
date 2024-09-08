@@ -8,6 +8,8 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 
+from rest_framework.throttling import UserRateThrottle,AnonRateThrottle #local throttling
+
 from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 
 from rest_framework.views import APIView #class based views
@@ -237,8 +239,9 @@ from rest_framework import generics,mixins
 class ReviewMixins(generics.ListAPIView):
     serializer_class = ReviewSerializer
     #block level permission it use for only this one
-    # permission_classes=[IsAuthenticated]   # when i access this without logged in this will give me->"detail": "Authentication credentials were not provided."
-
+    permission_classes=[IsAuthenticated]   # when i access this without logged in this will give me->"detail": "Authentication credentials were not provided."
+    
+    throttle_classes=[UserRateThrottle,AnonRateThrottle] #for local
     def get_queryset(self):
         pk = self.kwargs['pk']  # Access the 'pk' parameter from the URL
         return Review.objects.filter(watchList=pk)  # Filter reviews by the 'watchList' ID

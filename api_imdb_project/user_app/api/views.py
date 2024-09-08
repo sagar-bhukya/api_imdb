@@ -4,6 +4,8 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
+from rest_framework_simplejwt.tokens import RefreshToken #for creating tokens manually
+
 @api_view(['POST'])
 def registration_view(request):
     if request.method=='POST':
@@ -19,6 +21,14 @@ def registration_view(request):
 
             token=Token.objects.get(user=account).key
             data['token']=token
+
+            
+            # # here while registration it will gona create both refresh and access tokens 
+            # refresh= RefreshToken.for_user(account)
+            # data['token'] ={
+            #     'refresh' : str(refresh),
+            #     'access' : str(refresh.access_token),
+            # }
         else:
 
             data=serializer.errors

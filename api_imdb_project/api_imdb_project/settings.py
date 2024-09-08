@@ -154,5 +154,22 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # 'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-    ]
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+
+    #this about throttling its applied globally for all views
+    # 'DEFAULT_THROTTLE_CLASSES' : [
+    #     'rest_framework.throttling.AnonRateThrottle', # anon-> anonymous user means who is not registered our website ad we can identify by IP address for tracking 
+    #     'rest_framework.throttling.UserRateThrottle'# User-> user who registered in our website
+    # ],
+
+    'DEFAULT_THROTTLE_RATES' : {
+        'anon' : '3/day',  # without registered is getting only 1 day for all requests
+        'user' : '5/day' # for after login the using token we can get 3 day
+    }
+}
+
+
+SIMPLE_JWT={ # we can get many from the this for time limit and etc... https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html#rotate-refresh-tokens
+    "ROTATE_REFRESH_TOKENS" : True  # overwrites for creating refresh token again when we create access token with refresh token
 }
