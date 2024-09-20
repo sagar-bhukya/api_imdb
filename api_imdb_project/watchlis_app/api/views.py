@@ -12,6 +12,9 @@ from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 
+#pagination
+from watchlis_app.api.pagination import MoviewlistPagination,MoviewlistLOPagination,MoviewlistCursorPagination
+
 
 from rest_framework.throttling import UserRateThrottle,AnonRateThrottle,ScopedRateThrottle #local throttling
 
@@ -113,6 +116,11 @@ class MovieDetailAV(APIView):
 class Moviewlist(generics.ListAPIView):
     queryset=WatchList.objects.all()
     serializer_class = WatchListSerializer
+
+    # pagination_class=MoviewlistPagination  #PageNumberPagination
+    # pagination_class=MoviewlistLOPagination  #LimitOffsetPagination
+
+    pagination_class=MoviewlistCursorPagination #CursorPagination
 
     # #django-filertBackend used to filter something like amozon website
     # filter_backends = [DjangoFilterBackend] #used on only generic views mostly ListAPIView

@@ -170,8 +170,18 @@ REST_FRAMEWORK = {
         'review-create': '3/day',
         'review-list':'4/day',
         'review-detail':'3/day',
-    }
+    },
+  # for global pagination
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    # 'PAGE_SIZE': 5
+
+
+#only display json in webapis
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
 }
+
 
 
 SIMPLE_JWT={ # we can get many from the this for time limit and etc... https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html#rotate-refresh-tokens
