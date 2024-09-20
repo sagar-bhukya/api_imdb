@@ -8,13 +8,15 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 
-from rest_framework.throttling import UserRateThrottle,AnonRateThrottle #local throttling
+from rest_framework.throttling import UserRateThrottle,AnonRateThrottle,ScopedRateThrottle #local throttling
 
 from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly
 
 from rest_framework.views import APIView #class based views
 
 from watchlis_app.api.permissions import IsAdminOrReadOnly,IsReviewUserOrReadOnly
+
+from watchlis_app.api.throttling import ReviewCreateThrottle,ReviewListThrottle
 
 #function based views -----------------------
 
@@ -234,6 +236,9 @@ from rest_framework import generics,mixins
 #         return self.destroy(request,*args,**kwargs)
 
 
+
+
+
 #generic views as we write mixins code now this will not write any methods
 
 class ReviewMixins(generics.ListAPIView):
@@ -241,7 +246,7 @@ class ReviewMixins(generics.ListAPIView):
     #block level permission it use for only this one
     permission_classes=[IsAuthenticated]   # when i access this without logged in this will give me->"detail": "Authentication credentials were not provided."
     
-    throttle_classes=[UserRateThrottle,AnonRateThrottle] #for local
+    throttle_classes=[ReviewListThrottle,AnonRateThrottle] #for local
     def get_queryset(self):
         pk = self.kwargs['pk']  # Access the 'pk' parameter from the URL
         return Review.objects.filter(watchList=pk)  # Filter reviews by the 'watchList' ID
@@ -250,6 +255,8 @@ class ReviewCreate(generics.CreateAPIView):
     queryset = Review.objects.all()
     serializer_class=ReviewSerializer
     permission_classes=[IsAuthenticated]
+
+    throttle_classes=[ReviewCreateThrottle] # throttling scope get
 
     def perform_create(self,serializer): #it will act as post 
         pk=self.kwargs.get('pk')
@@ -272,6 +279,9 @@ class ReviewCreate(generics.CreateAPIView):
 class ReviewMixinsDetails(generics.RetrieveUpdateDestroyAPIView):
     queryset=Review.objects.all()
     serializer_class=ReviewSerializer
+
+    throttle_classes=[ScopedRateThrottle] #this for without creating any file for separate
+    throttle_scope='review-detail' # give how many requests do they want to send
     # permission_classes=[IsAuthenticatedOrReadOnly]# we can read only if user is not logged in
 
     # permission_classes=[IsAdminOrReadOnly]# here when the user logged then only can see the delete and edit option either he can see only get method

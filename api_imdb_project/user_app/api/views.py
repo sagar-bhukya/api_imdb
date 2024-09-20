@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 
-from rest_framework_simplejwt.tokens import RefreshToken #for creating tokens manually
+# from rest_framework_simplejwt.tokens import RefreshToken #for creating tokens manually
 
 @api_view(['POST'])
 def registration_view(request):

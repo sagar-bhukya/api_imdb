@@ -165,7 +165,10 @@ REST_FRAMEWORK = {
 
     'DEFAULT_THROTTLE_RATES' : {
         'anon' : '3/day',  # without registered is getting only 1 day for all requests
-        'user' : '5/day' # for after login the using token we can get 3 day
+        'user' : '5/day', # for after login the using token we can get 3 day
+        'review-create': '3/day',
+        'review-list':'4/day',
+        'review-detail':'3/day',
     }
 }
 
