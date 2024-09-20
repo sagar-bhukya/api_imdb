@@ -87,7 +87,11 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class WatchListSerializer(serializers.ModelSerializer):
-    reviews=ReviewSerializer(many=True,read_only=True)
+    # reviews=ReviewSerializer(many=True,read_only=True)
+
+    #we are getting platform id so write this 
+    platform=serializers.CharField(source='platform.name')
+
     #custom_serializer fields using serializerMethodFeild() : this will add in api this will not store in database
     # len_name=serializers.SerializerMethodField() #then create method using get_
 

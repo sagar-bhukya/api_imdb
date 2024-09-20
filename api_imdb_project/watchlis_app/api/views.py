@@ -7,6 +7,11 @@ from rest_framework import status
 from django.shortcuts import render
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
+from rest_framework import generics
+#filters
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+
 
 from rest_framework.throttling import UserRateThrottle,AnonRateThrottle,ScopedRateThrottle #local throttling
 
@@ -60,8 +65,6 @@ from watchlis_app.api.throttling import ReviewCreateThrottle,ReviewListThrottle
 
 
 
-
-
 #class based views---------------------
 class MovieListAv(APIView):
     permission_classes = [IsAdminOrReadOnly] #only admin can edit rest of all them read only
@@ -104,6 +107,45 @@ class MovieDetailAV(APIView):
         movie=WatchList.objects.get(pk=pk)
         movie.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+
+class Moviewlist(generics.ListAPIView):
+    queryset=WatchList.objects.all()
+    serializer_class = WatchListSerializer
+
+    # #django-filertBackend used to filter something like amozon website
+    # filter_backends = [DjangoFilterBackend] #used on only generic views mostly ListAPIView
+    # filterset_fields=['title','platform__name']
+
+    #SearchFilter: when the user give some input that we need to find and give him back to display
+    # filter_backends=[filters.SearchFilter]
+    # search_fields=['^title','platform__name'] #localhost:8000/watch/list2/?search=The
+    '''
+
+Prefix	Lookup	
+^	istartswith	Starts-with search.
+=	iexact	Exact matches.
+$	iregex	Regex search.
+@	search	Full-text search (Currently only supported Django's PostgreSQL backend).
+None	icontains	Contains search (Default).
+
+    '''
+
+    #OrderingFilter
+    filter_backends=[filters.OrderingFilter]#localhost:8000/watch/list2/?ordering=avg_arting  asc to desc
+                                            #localhost:8000/watch/list2/?ordering=-avg_arting  desc to asc
+    ordering_fields=['avg_arting']
+
+    
+
+
+
+
+
+
+
+
 
 '''
 #viewsets-------------allows you to combine the logic for a set of related views in a single class
@@ -239,6 +281,20 @@ from rest_framework import generics,mixins
 
 
 
+class UserReview(generics.ListAPIView):
+    serializer_class=ReviewSerializer
+    
+    #write get_query for filtering
+    # def get_queryset(self):
+    #     username=self.kwargs['username']
+    #     return Review.objects.filter(review_user__username=username) # thise __ gives for only this if you want filter about rating just give one _
+    
+
+    def get_queryset(self):
+        username = self.request.query_params.get('username',None) #it takes after watch/reviews/?username=sagar
+        return Review.objects.filter(review_user__username=username) # thise __ gives for only this if you want filter about rating just give one _
+    
+
 #generic views as we write mixins code now this will not write any methods
 
 class ReviewMixins(generics.ListAPIView):
@@ -247,6 +303,10 @@ class ReviewMixins(generics.ListAPIView):
     permission_classes=[IsAuthenticated]   # when i access this without logged in this will give me->"detail": "Authentication credentials were not provided."
     
     throttle_classes=[ReviewListThrottle,AnonRateThrottle] #for local
+
+    filter_backends = [DjangoFilterBackend] #used on only generic views mostly ListAPIView
+    filterset_fields=['review_user__username','active']
+
     def get_queryset(self):
         pk = self.kwargs['pk']  # Access the 'pk' parameter from the URL
         return Review.objects.filter(watchList=pk)  # Filter reviews by the 'watchList' ID

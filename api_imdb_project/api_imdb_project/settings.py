@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',# this can do create table called Token in DB after this you need to migrate
     'user_app',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
